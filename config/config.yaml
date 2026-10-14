@@ -1,0 +1,61 @@
+# Ecommerce Customer LTV Prediction - MLOps Config
+
+project:
+  name: Ecommerce_LTV_MLOps
+  version: "1.0.0"
+  seed: 42
+
+paths:
+  raw_data: data/raw
+  processed_data: data/processed
+  models_dir: models
+  reports_dir: reports
+  features_file: data/processed/features_.csv
+
+data:
+  kaggle_dataset: olistbr/brazilian-ecommerce
+  avg_return_amount: 230.0          # средний повторный чек (из ноутбука)
+  target_col: will_return
+  ltv_col: future_ltv
+  id_col: customer_unique_id
+  exclude_cols:
+    - customer_unique_id
+    - future_ltv
+    - will_return
+
+model:
+  n_folds: 5
+  scale_pos_weight: auto            # вычисляется автоматически
+  xgb:
+    n_estimators: 300
+    max_depth: 5
+    learning_rate: 0.05
+    subsample: 0.8
+    colsample_bytree: 0.8
+    eval_metric: auc
+  lgbm:
+    n_estimators: 300
+    max_depth: 5
+    learning_rate: 0.05
+    subsample: 0.8
+    colsample_bytree: 0.8
+    is_unbalance: true
+  catboost:
+    iterations: 300
+    depth: 5
+    learning_rate: 0.05
+    auto_class_weights: Balanced
+
+segmentation:
+  n_deciles: 10
+
+mlflow:
+  tracking_uri: mlruns
+  experiment_name: ltv_prediction
+
+api:
+  host: 0.0.0.0
+  port: 8000
+
+frontend:
+  port: 8501
